@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   MAÎTRE ABSI ELHEM — Moteur d'interactions premium v2
+   MAÎTRE ILHEM ABSI ANANE — Moteur d'interactions premium v2
    Preloader cinématique · curseur magnetique
    Manifesto mot-à-mot · aperçu flottant expertises · FAQ · horloge
    ═══════════════════════════════════════════════════════════════ */
@@ -328,6 +328,45 @@
       $('.field.is-invalid input, .field.is-invalid textarea')?.focus();
       return;
     }
+    const payload = {
+      name: name.value.trim(),
+      email: email.value.trim(),
+      phone: $('#f-phone').value.trim() || '—',
+      caseType: $('#f-type').value || 'Non spécifié',
+      message: msg.value.trim()
+    };
+
+    // Send POST request to real API Database endpoint
+    try {
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(res => res.json())
+        .then(data => console.log('[DATABASE API] Submission saved successfully:', data))
+        .catch(err => console.warn('[DATABASE API] Offline/fallback mode:', err));
+    } catch (err) {
+      console.warn('[DATABASE API] Fetch error:', err);
+    }
+
+    // Save to localStorage for Admin Dashboard fallback
+    const submission = {
+      id: 'sub_' + Date.now(),
+      date: new Date().toISOString(),
+      dateFormatted: new Intl.DateTimeFormat('fr-FR', {
+        dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Tunis'
+      }).format(new Date()),
+      ...payload,
+      status: 'Nouveau'
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem('contact_submissions') || '[]');
+      existing.unshift(submission);
+      localStorage.setItem('contact_submissions', JSON.stringify(existing));
+    } catch(err) {
+      console.error('Error saving submission to localStorage', err);
+    }
+
     const subject = encodeURIComponent(`Demande de rendez-vous — ${name.value.trim()}`);
     const body = encodeURIComponent(
       `Nom : ${name.value.trim()}\n` +
@@ -337,7 +376,7 @@
       `Message :\n${msg.value.trim()}`
     );
     success.hidden = false;
-    window.location.href = `mailto:contact@cabinet-absi-elhem.tn?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:contact@cabinet-absi-anane.tn?subject=${subject}&body=${body}`;
     form.reset();
     setTimeout(() => { success.hidden = true; }, 12000);
   });

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /arena/
+
+Sitemap: https://cabinet-absi-anane.tn/sitemap.xml

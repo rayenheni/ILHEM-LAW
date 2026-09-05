@@ -1,34 +1,33 @@
-# Maître Absi Elhem — Portfolio Avocate
+# Maître Ilhem ABSI ANANE — Portfolio Avocate · Premium v2
 
-Site portfolio premium pour **Maître Absi Elhem**, avocate au Barreau de Tunis, spécialiste en droit privé.
+Site portfolio premium pour **Maître Ilhem ABSI ANANE**, avocate au Barreau de Djerba, spécialiste en droit privé.
 
-Refonte haute couture du site d'origine (`portfolio-elhem.vercel.app`) avec une direction artistique
-« cabinet d'avocats de luxe » : encre profonde, or, crème, typographie éditoriale serif.
+Refonte inspirée des sites de cabinets primés sur Awwwards (Kohen Avocats, Joseph Law,
+Kümmerlein, Hafnia Law…) : direction artistique « cabinet de luxe » — encre profonde,
+or, crème, typographie éditoriale serif (Cormorant Garamond + Jost).
 
-## ✨ Fonctionnalités
+## ✨ Expérience
 
-- **Préloader** élégant avec monogramme balance de justice
-- **Curseur personnalisé** (point + anneau magnétique, desktop uniquement)
-- **Barre de progression de lecture** dorée
-- **Header fixe** qui se compacte au défilement + lien actif automatique
-- **Menu mobile** plein écran animé
-- **Révélations au scroll** (IntersectionObserver, décalages en cascade)
-- **Compteurs animés** (250+ dossiers, 5+ années, 92% réussite, 100% satisfaits)
-- **Barres de compétences linguistiques** animées
-- **Parallaxe douce** sur les visuels
-- **Timeline de parcours** (formation + expérience avec accordéon « Voir détails »)
-- **Formulaire de contact** avec validation inline et génération d'e-mail pré-rempli (mailto)
-- **Marquee** défilant des domaines du droit
-- Respect de `prefers-reduced-motion`, SEO complet (Open Graph, meta description, favicon SVG)
+- **Preloader cinématique** — monogramme, compteur 0 → 100 %, révélation en rideau
+- **Défilement inertiel** — smooth scroll Lenis (fallback natif si CDN indisponible)
+- **Titre héro masqué** — révélation ligne par ligne + soulignement doré animé
+- **Manifesto mot-à-mot** — le texte s'illumine au fil du défilement
+- **Expertises façon Awwwards** — liste éditoriale avec **aperçu photo flottant** qui suit le curseur
+- **La Méthode** — accompagnement en 4 étapes (Écoute, Analyse, Stratégie, Défense)
+- **FAQ** — accordéon élégant, 5 questions essentielles
+- **Footer monumental** — nom géant en contour or, **horloge locale de Tunis en direct**
+- **Curseur personnalisé** avec étiquette « Voir » sur les expertises
+- **Boutons magnétiques**, grain de film global, marquees, compteurs animés,
+  barres de langues, parallaxe, header compact, menu mobile plein écran
 
 ## 🗂 Structure
 
 ```
-├── index.html          # Page unique (sections : Hero, Stats, Profil, Expertises,
-│                       #   Valeurs/Cabinet, Parcours, Contact, CTA, Footer)
+├── index.html          # Page unique (Hero, Stats, Profil, Expertises, Valeurs,
+│                       #   Parcours, Méthode, Contact, FAQ, CTA, Footer)
 ├── css/style.css       # Design system complet (variables, composants, responsive)
-├── js/main.js          # Interactions (vanilla JS, zéro dépendance)
-└── assets/img/         # Portrait, visuel cabinet, favicon SVG
+├── js/main.js          # Moteur d'interactions (vanilla, zéro dépendance obligatoire)
+└── assets/img/         # Portrait, cabinet, 5 visuels d'expertises, favicon SVG
 ```
 
 ## 🚀 Utilisation
@@ -39,8 +38,10 @@ Site 100 % statique — ouvrez `index.html` ou servez le dossier :
 python3 -m http.server 8000
 ```
 
+Déploiement : Vercel / Netlify / GitHub Pages (préréglage statique, **aucun build**).
+
 ## 📝 À personnaliser
 
-Les coordonnées (téléphone, email, adresse) sont des espaces réservés faciles à remplacer :
-- `index.html` → section `#contact` (cartes + `mailto:` dans `js/main.js`)
-- Police : Cormorant Garamond (titres) + Jost (texte), via Google Fonts
+Coordonnées (placeholders) : section `#contact` de `index.html` + `mailto:` dans `js/main.js`.
+Réponses de la FAQ : section `.faq` de `index.html`.
+Lenis (optionnel) : servi via CDN `unpkg.com/lenis` — le site reste pleinement fonctionnel sans.

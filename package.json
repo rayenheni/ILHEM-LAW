@@ -1,0 +1,17 @@
+{
+  "name": "portfolio-maitre-ilhem-absi-anane",
+  "version": "2.0.0",
+  "description": "Site Web & Cabinet d'Avocat Maître Ilhem ABSI ANANE avec Base de Données Réelle & Espace Admin",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["avocate", "djerba", "tunisie", "portfolio", "database"],
+  "author": "Maître Ilhem ABSI ANANE",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

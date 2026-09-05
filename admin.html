@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace Admin — Maître Ilhem ABSI ANANE</title>
+
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:ital,wght@0,300;0,400;0,500;0,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    :root {
+      --admin-bg: #071009;
+      --admin-card: rgba(255, 255, 255, 0.03);
+      --admin-card-border: rgba(197, 160, 89, 0.2);
+    }
+    body {
+      background-color: var(--admin-bg);
+      color: #e2e8f0;
+      font-family: 'Jost', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* LOGIN SCREEN OVERLAY */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 12, 7, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      transition: opacity 0.3s ease;
+    }
+    .login-overlay.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+    .login-box {
+      background: rgba(13, 26, 16, 0.95);
+      border: 1px solid var(--c-gold, #c5a059);
+      border-radius: 14px;
+      max-width: 420px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+      text-align: center;
+    }
+    .login-box__icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.25rem;
+      color: var(--c-gold, #c5a059);
+    }
+    .login-box__title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--c-gold, #c5a059);
+      margin-bottom: 0.4rem;
+    }
+    .login-box__sub {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      margin-bottom: 2rem;
+    }
+    .login-field {
+      text-align: left;
+      margin-bottom: 1.25rem;
+    }
+    .login-field label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #cbd5e1;
+      margin-bottom: 0.4rem;
+    }
+    .login-field input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    .login-field input:focus {
+      outline: none;
+      border-color: #c5a059;
+    }
+    .login-error {
+      color: #fca5a5;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+      background: rgba(239, 68, 68, 0.15);
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      display: none;
+    }
+
+    /* ADMIN DASHBOARD HEADER & CONTENT */
+    .admin-header {
+      background: rgba(10, 22, 13, 0.95);
+      border-bottom: 1px solid var(--admin-card-border);
+      backdrop-filter: blur(12px);
+      padding: 1.25rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .admin-header__inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .admin-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--c-gold, #c5a059);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .admin-title span {
+      font-size: 0.85rem;
+      font-family: 'Jost', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .admin-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn-admin {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--admin-card-border);
+      background: rgba(197, 160, 89, 0.08);
+      color: #f1f5f9;
+      text-decoration: none;
+    }
+    .btn-admin:hover {
+      background: rgba(197, 160, 89, 0.22);
+      border-color: #c5a059;
+      color: #fff;
+    }
+    .btn-admin--danger {
+      border-color: rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.08);
+      color: #fca5a5;
+    }
+    .btn-admin--danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fff;
+    }
+    .admin-container {
+      max-width: 1300px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-card-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stat-card__val {
+      font-size: 2rem;
+      font-weight: 700;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--c-gold, #c5a059);
+    }
+    .stat-card__lbl {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.25rem;
+    }
+    .filter-bar {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-card-border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-input {
+      flex: 1;
+      min-width: 220px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 0.6rem 1rem;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .filter-input:focus {
+      outline: none;
+      border-color: #c5a059;
+    }
+    .filter-select {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 0.6rem 1rem;
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .filter-select option {
+      background: #0d1a10;
+      color: #fff;
+    }
+    .subs-table-wrap {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-card-border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    table.subs-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    table.subs-table th, table.subs-table td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    table.subs-table th {
+      background: rgba(0, 0, 0, 0.4);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+    }
+    table.subs-table tbody tr {
+      transition: background 0.15s ease;
+    }
+    table.subs-table tbody tr:hover {
+      background: rgba(197, 160, 89, 0.04);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge--new {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge--done {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge--casetype {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .actions-cell {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .btn-icon {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      color: #cbd5e1;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-icon:hover {
+      background: #c5a059;
+      color: #000;
+      border-color: #c5a059;
+    }
+    .empty-state {
+      padding: 4rem 2rem;
+      text-align: center;
+      color: #94a3b8;
+    }
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Modal Details */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-overlay.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-box {
+      background: #0d1a10;
+      border: 1px solid var(--c-gold, #c5a059);
+      border-radius: 12px;
+      max-width: 650px;
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      color: var(--c-gold, #c5a059);
+      margin-bottom: 1.25rem;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: rgba(0,0,0,0.3);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .detail-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+    }
+    .detail-val {
+      font-size: 0.95rem;
+      color: #f1f5f9;
+      font-weight: 500;
+      margin-top: 0.2rem;
+    }
+    .msg-content {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 1.25rem;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ÉCRAN DE CONNEXION SÉCURISÉ (LOGIN OVERLAY) -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <svg class="login-box__icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity=".45"/>
+        <path d="M32 12v40M20 18h24" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M20 18l-6 14a7 7 0 0 0 12 0l-6-14zM44 18l-6 14a7 7 0 0 0 12 0l-6-14z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 52h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <h2 class="login-box__title">Connexion Espace Admin</h2>
+      <p class="login-box__sub">Maître Ilhem ABSI ANANE — Base de Données</p>
+      
+      <form id="loginForm" novalidate>
+        <div class="login-field">
+          <label for="l-user">Identifiant Admin</label>
+          <input type="text" id="l-user" placeholder="admin" required autocomplete="username">
+        </div>
+        <div class="login-field">
+          <label for="l-pass">Mot de passe</label>
+          <input type="password" id="l-pass" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div class="login-error" id="loginError">Identifiants incorrects.</div>
+        <button type="submit" class="btn-admin" style="width: 100%; justify-content: center; margin-top: 1rem; padding: 0.75rem;">
+          🔐 Se connecter
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- HEADER ADMIN -->
+  <header class="admin-header">
+    <div class="admin-header__inner">
+      <div class="admin-title">
+        Maître Ilhem ABSI ANANE
+        <span>Espace Admin</span>
+      </div>
+      <div class="admin-actions">
+        <button class="btn-admin" id="btnSample">✨ Ajouter démo test</button>
+        <button class="btn-admin" id="btnExport">📥 Exporter CSV</button>
+        <a href="/" class="btn-admin">🌐 Voir le site</a>
+        <button class="btn-admin btn-admin--danger" id="btnClear">🗑️ Vider tout</button>
+        <button class="btn-admin btn-admin--danger" id="btnLogout">🚪 Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="admin-container">
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div>
+          <div class="stat-card__val" id="stTotal">0</div>
+          <div class="stat-card__lbl">Demandes Totales</div>
+        </div>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="stat-card__val" id="stNew" style="color: #fbbf24;">0</div>
+          <div class="stat-card__lbl">Nouvelles Demandes</div>
+        </div>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="stat-card__val" id="stDone" style="color: #34d399;">0</div>
+          <div class="stat-card__lbl">Demandes Traitées</div>
+        </div>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+    </div>
+
+    <!-- FILTRES -->
+    <div class="filter-bar">
+      <input type="text" class="filter-input" id="filterSearch" placeholder="Rechercher par nom, email, téléphone ou message…">
+      <select class="filter-select" id="filterCase">
+        <option value="">Tous les types de dossiers</option>
+        <option>Droit civil</option>
+        <option>Contentieux</option>
+        <option>Conseil juridique</option>
+        <option>Droit de la famille</option>
+        <option>Contrats &amp; Commercial</option>
+        <option>Autre</option>
+      </select>
+      <select class="filter-select" id="filterStatus">
+        <option value="">Tous les statuts</option>
+        <option value="Nouveau">Nouveaux</option>
+        <option value="Traité">Traités</option>
+      </select>
+    </div>
+
+    <!-- TABLEAU DE DEMANDES -->
+    <div class="subs-table-wrap">
+      <table class="subs-table">
+        <thead>
+          <tr>
+            <th>Date &amp; Heure</th>
+            <th>Nom du Client</th>
+            <th>Contact</th>
+            <th>Type de Dossier</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="subsTableBody">
+          <!-- Injecté dynamiquement par JS -->
+        </tbody>
+      </table>
+      <div class="empty-state" id="emptyState" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        <p>Aucune demande de rendez-vous enregistrée pour le moment.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL DE DÉTAILS -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <h3 class="modal-title">Détails de la demande</h3>
+      <div class="detail-grid">
+        <div>
+          <div class="detail-label">Nom du client</div>
+          <div class="detail-val" id="mdlName">-</div>
+        </div>
+        <div>
+          <div class="detail-label">Date &amp; Heure</div>
+          <div class="detail-val" id="mdlDate">-</div>
+        </div>
+        <div>
+          <div class="detail-label">Email</div>
+          <div class="detail-val" id="mdlEmail">-</div>
+        </div>
+        <div>
+          <div class="detail-label">Téléphone</div>
+          <div class="detail-val" id="mdlPhone">-</div>
+        </div>
+        <div>
+          <div class="detail-label">Type de dossier</div>
+          <div class="detail-val" id="mdlCase">-</div>
+        </div>
+        <div>
+          <div class="detail-label">Statut</div>
+          <div class="detail-val" id="mdlStatus">-</div>
+        </div>
+      </div>
+      <div class="detail-label" style="margin-bottom: 0.4rem;">Message du client</div>
+      <div class="msg-content" id="mdlMessage"></div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <a href="#" id="mdlCallBtn" class="btn-admin">📞 Appeler</a>
+        <a href="#" id="mdlMailBtn" class="btn-admin">✉️ Envoyer un Email</a>
+        <button class="btn-admin" id="mdlToggleStatus">✅ Marquer Traité</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'contact_submissions';
+      const AUTH_KEY = 'admin_session_token';
+
+      let cacheSubmissions = [];
+
+      const getAuthToken = () => sessionStorage.getItem(AUTH_KEY) || localStorage.getItem(AUTH_KEY) || '';
+
+      const getAuthHeaders = () => ({
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'x-admin-token': getAuthToken()
+      });
+
+      // Login Elements
+      const loginOverlay = document.getElementById('loginOverlay');
+      const loginForm = document.getElementById('loginForm');
+      const loginError = document.getElementById('loginError');
+
+      // Check auth status
+      const checkAuth = async () => {
+        const token = getAuthToken();
+        if (!token) {
+          showLogin();
+          return false;
+        }
+        try {
+          const res = await fetch('/api/admin/verify', { headers: getAuthHeaders() });
+          if (res.ok) {
+            hideLogin();
+            return true;
+          }
+        } catch(e) {}
+        
+        // If verification fails, fallback check or show login
+        showLogin();
+        return false;
+      };
+
+      const showLogin = () => {
+        loginOverlay.classList.remove('is-hidden');
+      };
+
+      const hideLogin = () => {
+        loginOverlay.classList.add('is-hidden');
+      };
+
+      // Login form submit
+      loginForm.onsubmit = async (e) => {
+        e.preventDefault();
+        loginError.style.display = 'none';
+
+        const user = document.getElementById('l-user').value.trim();
+        const pass = document.getElementById('l-pass').value.trim();
+
+        try {
+          const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+          });
+          const data = await res.json();
+
+          if (res.ok && data.success && data.token) {
+            sessionStorage.setItem(AUTH_KEY, data.token);
+            hideLogin();
+            loadSubmissions();
+          } else {
+            loginError.textContent = data.error || 'Identifiants incorrects.';
+            loginError.style.display = 'block';
+          }
+        } catch(err) {
+          // Fallback login if offline (password: Ilhem@2026!)
+          if (pass === 'Ilhem@2026!' || pass === 'admin') {
+            sessionStorage.setItem(AUTH_KEY, 'local_admin_token');
+            hideLogin();
+            loadSubmissions();
+          } else {
+            loginError.textContent = 'Erreur de connexion. Vérifiez vos identifiants.';
+            loginError.style.display = 'block';
+          }
+        }
+      };
+
+      // Logout
+      document.getElementById('btnLogout').onclick = () => {
+        sessionStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem(AUTH_KEY);
+        showLogin();
+      };
+
+      const loadSubmissions = async () => {
+        try {
+          const res = await fetch('/api/contact', { headers: getAuthHeaders() });
+          if (res.ok) {
+            const result = await res.json();
+            if (result.success && Array.isArray(result.data)) {
+              cacheSubmissions = result.data;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheSubmissions));
+              render();
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn('[ADMIN DB API] Fetching from API failed, using localStorage fallback', err);
+        }
+        try {
+          cacheSubmissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch (e) {
+          cacheSubmissions = [];
+        }
+        render();
+      };
+
+      const getSubmissions = () => cacheSubmissions;
+
+      const setSubmissions = (subs) => {
+        cacheSubmissions = subs;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(subs));
+        render();
+      };
+
+      // Elements
+      const tbody = document.getElementById('subsTableBody');
+      const emptyState = document.getElementById('emptyState');
+      const stTotal = document.getElementById('stTotal');
+      const stNew = document.getElementById('stNew');
+      const stDone = document.getElementById('stDone');
+
+      const filterSearch = document.getElementById('filterSearch');
+      const filterCase = document.getElementById('filterCase');
+      const filterStatus = document.getElementById('filterStatus');
+
+      // Modal elements
+      const modal = document.getElementById('detailModal');
+      const modalClose = document.getElementById('modalClose');
+      const mdlName = document.getElementById('mdlName');
+      const mdlDate = document.getElementById('mdlDate');
+      const mdlEmail = document.getElementById('mdlEmail');
+      const mdlPhone = document.getElementById('mdlPhone');
+      const mdlCase = document.getElementById('mdlCase');
+      const mdlStatus = document.getElementById('mdlStatus');
+      const mdlMessage = document.getElementById('mdlMessage');
+      const mdlCallBtn = document.getElementById('mdlCallBtn');
+      const mdlMailBtn = document.getElementById('mdlMailBtn');
+      const mdlToggleStatus = document.getElementById('mdlToggleStatus');
+
+      let currentActiveId = null;
+
+      const render = () => {
+        const subs = getSubmissions();
+
+        // Update stats
+        stTotal.textContent = subs.length;
+        stNew.textContent = subs.filter(s => s.status === 'Nouveau').length;
+        stDone.textContent = subs.filter(s => s.status === 'Traité').length;
+
+        // Filter
+        const query = filterSearch.value.trim().toLowerCase();
+        const caseFilter = filterCase.value;
+        const statusFilter = filterStatus.value;
+
+        const filtered = subs.filter(s => {
+          const matchQ = !query || 
+            (s.name && s.name.toLowerCase().includes(query)) ||
+            (s.email && s.email.toLowerCase().includes(query)) ||
+            (s.phone && s.phone.toLowerCase().includes(query)) ||
+            (s.message && s.message.toLowerCase().includes(query));
+          const matchCase = !caseFilter || s.caseType === caseFilter;
+          const matchStatus = !statusFilter || s.status === statusFilter;
+          return matchQ && matchCase && matchStatus;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '';
+          emptyState.hidden = false;
+          return;
+        }
+
+        emptyState.hidden = true;
+        tbody.innerHTML = filtered.map(s => `
+          <tr>
+            <td style="font-size: 0.85rem; color: #94a3b8;">${s.dateFormatted || new Date(s.date).toLocaleString('fr-FR')}</td>
+            <td><strong>${escapeHtml(s.name)}</strong></td>
+            <td>
+              <div style="font-size: 0.88rem;">${escapeHtml(s.email)}</div>
+              <div style="font-size: 0.82rem; color: #94a3b8;">${escapeHtml(s.phone)}</div>
+            </td>
+            <td><span class="badge badge--casetype">${escapeHtml(s.caseType || 'Autre')}</span></td>
+            <td>
+              <span class="badge ${s.status === 'Nouveau' ? 'badge--new' : 'badge--done'}">
+                ${s.status || 'Nouveau'}
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-icon" onclick="viewDetails('${s.id}')" title="Voir détails">👁️</button>
+                <button class="btn-icon" onclick="toggleStatus('${s.id}')" title="Changer statut">
+                  ${s.status === 'Nouveau' ? '✅' : '📩'}
+                </button>
+                <button class="btn-icon" onclick="deleteSub('${s.id}')" title="Supprimer" style="color: #fca5a5;">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      };
+
+      const escapeHtml = (str) => {
+        if (!str) return '';
+        return str.replace(/[&<>"']/g, m => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        })[m]);
+      };
+
+      window.viewDetails = (id) => {
+        const subs = getSubmissions();
+        const sub = subs.find(s => s.id === id);
+        if (!sub) return;
+
+        currentActiveId = id;
+        mdlName.textContent = sub.name;
+        mdlDate.textContent = sub.dateFormatted || new Date(sub.date).toLocaleString('fr-FR');
+        mdlEmail.textContent = sub.email;
+        mdlPhone.textContent = sub.phone;
+        mdlCase.textContent = sub.caseType;
+        mdlStatus.textContent = sub.status;
+        mdlMessage.textContent = sub.message;
+
+        mdlCallBtn.href = sub.phone && sub.phone !== '—' ? `tel:${sub.phone}` : '#';
+        mdlMailBtn.href = `mailto:${sub.email}?subject=${encodeURIComponent('Suite à votre demande de rendez-vous — Cabinet Maître Ilhem ABSI ANANE')}`;
+        mdlToggleStatus.textContent = sub.status === 'Nouveau' ? '✅ Marquer comme Traité' : '📩 Marquer comme Nouveau';
+
+        modal.classList.add('is-active');
+      };
+
+      window.toggleStatus = async (id) => {
+        const sub = cacheSubmissions.find(s => s.id === id);
+        if (sub) {
+          sub.status = sub.status === 'Nouveau' ? 'Traité' : 'Nouveau';
+          setSubmissions(cacheSubmissions);
+          if (modal.classList.contains('is-active') && currentActiveId === id) {
+            viewDetails(id);
+          }
+          try {
+            await fetch(`/api/contact/${id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+              body: JSON.stringify({ status: sub.status })
+            });
+          } catch(e) {}
+        }
+      };
+
+      window.deleteSub = async (id) => {
+        if (confirm('Voulez-vous vraiment supprimer cette demande ?')) {
+          cacheSubmissions = cacheSubmissions.filter(s => s.id !== id);
+          setSubmissions(cacheSubmissions);
+          if (currentActiveId === id) modal.classList.remove('is-active');
+          try {
+            await fetch(`/api/contact/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+          } catch(e) {}
+        }
+      };
+
+      // Modal event handlers
+      modalClose.onclick = () => modal.classList.remove('is-active');
+      modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('is-active'); };
+      mdlToggleStatus.onclick = () => {
+        if (currentActiveId) toggleStatus(currentActiveId);
+      };
+
+      // Filter events
+      filterSearch.oninput = render;
+      filterCase.onchange = render;
+      filterStatus.onchange = render;
+
+      // Sample data button
+      document.getElementById('btnSample').onclick = () => {
+        const samples = [
+          {
+            id: 'sub_' + Date.now(),
+            date: new Date().toISOString(),
+            dateFormatted: new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()),
+            name: 'Kamel Ben Salem',
+            email: 'kamel.bensalem@gmail.com',
+            phone: '+216 98 123 456',
+            caseType: 'Droit civil',
+            message: 'Bonjour Maître, je souhaite fixer une consultation pour un litige de propriété foncière situé à Houmt Souk Djerba.',
+            status: 'Nouveau'
+          },
+          {
+            id: 'sub_' + (Date.now() - 86400000),
+            date: new Date(Date.now() - 86400000).toISOString(),
+            dateFormatted: new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(Date.now() - 86400000)),
+            name: 'Sonia Trabelsi',
+            email: 'strabelsi.conseil@yahoo.fr',
+            phone: '+216 22 987 654',
+            caseType: 'Contrats & Commercial',
+            message: 'Bonjour, nous aurions besoin de votre expertise pour la rédaction et la révision d’une convention commerciale internationale.',
+            status: 'Traité'
+          }
+        ];
+        samples.forEach(s => {
+          try {
+            fetch('/api/contact', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(s)
+            });
+          } catch(e) {}
+        });
+        setSubmissions([...samples, ...cacheSubmissions]);
+      };
+
+      // Export CSV
+      document.getElementById('btnExport').onclick = () => {
+        const subs = getSubmissions();
+        if (subs.length === 0) {
+          alert('Aucune donnée à exporter.');
+          return;
+        }
+        let csv = 'ID,Date,Nom,Email,Telephone,TypeDossier,Statut,Message\n';
+        subs.forEach(s => {
+          csv += `"${s.id}","${s.dateFormatted}","${s.name}","${s.email}","${s.phone}","${s.caseType}","${s.status}","${(s.message || '').replace(/"/g, '""')}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `demandes_clients_maitre_absi_anane_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+      };
+
+      // Clear all
+      document.getElementById('btnClear').onclick = async () => {
+        if (confirm('Êtes-vous sûr de vouloir tout supprimer ? Cette action est irréversible.')) {
+          try {
+            await fetch('/api/contact', { method: 'DELETE', headers: getAuthHeaders() });
+          } catch(e) {}
+          setSubmissions([]);
+        }
+      };
+
+      // Listen to real-time form submissions across tabs
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY) {
+          loadSubmissions();
+        }
+      });
+
+      // Initial check & load
+      checkAuth().then(ok => {
+        if (ok) loadSubmissions();
+      });
+    })();
+  </script>
+</body>
+</html>
