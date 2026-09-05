@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maître Absi Elhem — Avocate au Barreau de Tunis | Droit Privé</title>
-  <meta name="description" content="Maître Absi Elhem, avocate au Barreau de Tunis, spécialiste en droit privé. Plaidoirie, conseil, expertise juridique. Rigueur, éthique et engagement total pour chaque dossier.">
-  <meta name="keywords" content="avocate Tunis, Barreau de Tunis, droit privé, Absi Elhem, avocate Tunisie, contentieux, conseil juridique">
+  <title>Maître Absi Elhem — Avocate au Barreau de Djerba | Droit Privé</title>
+  <meta name="description" content="Maître Absi Elhem, avocate au Barreau de Djerba, spécialiste en droit privé. Plaidoirie, conseil, expertise juridique. Rigueur, éthique et engagement total pour chaque dossier.">
+  <meta name="keywords" content="avocate Djerba, Barreau de Djerba, Barreau de Djerba, droit privé, Absi Elhem, avocate Tunisie, contentieux, conseil juridique">
   <meta name="author" content="Maître Absi Elhem">
-  <meta property="og:title" content="Maître Absi Elhem — Avocate au Barreau de Tunis">
+  <meta property="og:title" content="Maître Absi Elhem — Avocate au Barreau de Djerba">
   <meta property="og:description" content="L'art de la Défense. Une expertise juridique au service de vos droits.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="assets/img/portrait.jpg">
-  <meta name="theme-color" content="#0A0F1E">
+  <meta property="og:image" content="https://portfolio-elhem.vercel.app/tas.png">
+  <link rel="alternate" hreflang="fr" href="./">
+  <link rel="alternate" hreflang="ar" href="./ar.html">
+  <meta name="theme-color" content="#071009">
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,14 +32,22 @@
         <path d="M24 52h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
       <p class="preloader__name">Absi&nbsp;Elhem</p>
-      <p class="preloader__sub">Avocate — Barreau de Tunis</p>
+      <p class="preloader__sub">Avocate — Barreau de Djerba</p>
       <div class="preloader__bar"><span></span></div>
+      <p class="preloader__pct"><span id="preloaderPct">0</span>%</p>
     </div>
+    <div class="preloader__curtain" aria-hidden="true"></div>
   </div>
 
   <!-- ═══ CURSOR -->
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
-  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"><span class="cursor-ring__label" id="cursorLabel"></span></div>
+
+  <!-- ═══ FLOATING IMAGE PREVIEW (expertises) -->
+  <div class="xp-preview" id="xpPreview" aria-hidden="true">
+    <img src="" alt="" id="xpPreviewImg" width="560" height="700">
+    <span class="xp-preview__frame"></span>
+  </div>
 
   <!-- ═══ SCROLL PROGRESS -->
   <div class="scroll-progress" aria-hidden="true"><span id="scrollProgressBar"></span></div>
@@ -54,7 +64,7 @@
         </svg>
         <span class="brand__text">
           <strong>Absi Elhem</strong>
-          <em>Avocate — Barreau de Tunis</em>
+          <em>Avocate — Barreau de Djerba</em>
         </span>
       </a>
 
@@ -62,9 +72,13 @@
         <a href="#profil"    class="nav__link">Profil</a>
         <a href="#expertise" class="nav__link">Expertises</a>
         <a href="#parcours"  class="nav__link">Parcours</a>
-        <a href="#cabinet"   class="nav__link">Le Cabinet</a>
+        <a href="#methode"   class="nav__link">Méthode</a>
         <a href="#contact"   class="nav__link">Contact</a>
-        <a href="#contact"   class="btn btn--gold nav__cta">
+        <span class="lang-sw" role="group" aria-label="Choix de la langue">
+          <a href="./" class="is-active" aria-current="true" lang="fr">FR</a>
+          <a href="./ar.html" lang="ar" hreflang="ar" aria-label="Version arabe">عربي</a>
+        </span>
+        <a href="#contact"   class="btn btn--gold nav__cta magnetic">
           <span>Prendre rendez-vous</span>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
@@ -82,36 +96,36 @@
       <div class="hero__bg" aria-hidden="true">
         <div class="hero__glow"></div>
         <div class="hero__grain"></div>
-        <span class="hero__side-text">Barreau de Tunis — Droit Privé</span>
-        <span class="hero__side-text hero__side-text--right">Est. 2022 — Tunis, Tunisie</span>
+        <span class="hero__side-text">Barreau de Djerba — Droit Privé</span>
+        <span class="hero__side-text hero__side-text--right">Est. 2022 — Djerba, Tunisie</span>
       </div>
 
       <div class="container hero__grid">
         <div class="hero__content">
-          <p class="kicker reveal">
+          <p class="kicker pop" style="--d:.15s">
             <span class="kicker__rule"></span>
             Maître Absi Elhem · Avocate
           </p>
           <h1 class="hero__title">
-            <span class="hero__title-line reveal">L'art de la</span>
-            <span class="reveal hero__title-accent"><em>Défense</em><span class="accent-stroke" aria-hidden="true"></span></span>
+            <span class="mask"><span class="mask__inner" style="--d:.25s">L'art de la</span></span>
+            <span class="mask hero__title-accent-wrap"><span class="mask__inner hero__title-accent" style="--d:.4s"><em>Défense</em><span class="accent-stroke" aria-hidden="true"></span></span></span>
           </h1>
-          <p class="hero__lead reveal">
+          <p class="hero__lead pop" style="--d:.6s">
             Une expertise juridique au service de vos droits.
             <strong>Rigueur, éthique et engagement total</strong> pour chaque dossier.
           </p>
-          <div class="hero__actions reveal">
-            <a href="#contact" class="btn btn--gold btn--lg">
+          <div class="hero__actions pop" style="--d:.75s">
+            <a href="#contact" class="btn btn--gold btn--lg magnetic">
               <span>Réserver un rendez-vous</span>
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a href="#profil" class="btn btn--ghost btn--lg"><span>Découvrir mon profil</span></a>
+            <a href="#profil" class="btn btn--ghost btn--lg magnetic"><span>Découvrir mon profil</span></a>
           </div>
         </div>
 
-        <div class="hero__visual reveal">
+        <div class="hero__visual pop" style="--d:.5s">
           <figure class="portrait-frame" data-parallax="0.08">
-            <img src="assets/img/portrait.jpg" alt="Maître Absi Elhem, Avocate au Barreau de Tunis" width="880" height="1100" fetchpriority="high">
+            <img src="https://portfolio-elhem.vercel.app/tas.png" alt="Maître Absi Elhem, Avocate au Barreau de Djerba" width="362" height="356" fetchpriority="high" class="real-photo">
             <span class="portrait-frame__corner portrait-frame__corner--tl"></span>
             <span class="portrait-frame__corner portrait-frame__corner--br"></span>
           </figure>
@@ -164,14 +178,16 @@
     <section class="about section" id="profil">
       <div class="container">
         <header class="section-head reveal">
-          <p class="kicker kicker--dark"><span class="kicker__rule"></span>À propos de moi</p>
+          <p class="kicker kicker--dark"><span class="kicker__rule"></span><span class="kicker__index">01</span>À propos de moi</p>
           <h2 class="section-title">L'excellence au service<br><em>de chaque client.</em></h2>
         </header>
+
+        <p class="manifesto" id="manifesto">Chaque dossier mérite une défense <em>intransigeante.</em></p>
 
         <div class="about__grid">
           <div class="about__visual reveal">
             <figure class="about__frame" data-parallax="0.06">
-              <img src="assets/img/about.jpg" alt="Balance de la justice et ouvrages juridiques dans le cabinet" loading="lazy" width="800" height="1100">
+              <img src="assets/img/about.webp" alt="Balance de la justice et ouvrages juridiques dans le cabinet" loading="lazy" width="800" height="1100">
             </figure>
             <div class="about__stamp" data-parallax="-0.04">
               <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
@@ -187,7 +203,7 @@
             <p class="about__text reveal">
               Avocate <strong>rigoureuse et polyvalente</strong>, reconnue pour sa capacité d'analyse
               et son sens de l'éthique. Mon parcours académique et professionnel m'a forgé une vision
-              claire&nbsp;: <em>chaque dossier mérite une défense intransigeante.</em>
+              claire du métier et de ses exigences.
             </p>
             <p class="about__text reveal">
               Orientée vers la résolution de problématiques complexes, j'allie réactivité, précision
@@ -231,60 +247,72 @@
           <h2 class="section-title">Domaines <em>d'Expertise</em></h2>
         </header>
 
-        <div class="xp-grid">
-          <article class="xp reveal">
-            <span class="xp__num">01</span>
-            <span class="xp__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M3 11l19-7-7 19-2.5-9.5L3 11z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <div class="xp-list">
+          <a href="#contact" class="xp-row reveal" data-img="assets/img/xp/plaidoirie.webp" data-cursor="Voir">
+            <span class="xp-row__num">01</span>
+            <span class="xp-row__main">
+              <span class="xp-row__title">Plaidoirie</span>
+              <span class="xp-row__desc">Représentation vigoureuse devant les juridictions compétentes.</span>
             </span>
-            <h3 class="xp__title">Plaidoirie</h3>
-            <p class="xp__desc">Représentation vigoureuse devant les juridictions compétentes.</p>
-          </article>
+            <span class="xp-row__arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </a>
 
-          <article class="xp reveal">
-            <span class="xp__num">02</span>
-            <span class="xp__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <a href="#contact" class="xp-row reveal" data-img="assets/img/xp/empathie.webp" data-cursor="Voir">
+            <span class="xp-row__num">02</span>
+            <span class="xp-row__main">
+              <span class="xp-row__title">Éthique</span>
+              <span class="xp-row__desc">Respect strict des règles déontologiques.</span>
             </span>
-            <h3 class="xp__title">Éthique</h3>
-            <p class="xp__desc">Respect strict des règles déontologiques.</p>
-          </article>
+            <span class="xp-row__arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </a>
 
-          <article class="xp reveal">
-            <span class="xp__num">03</span>
-            <span class="xp__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.6 0-3.1-.4-4.4-1.2L3 20l1.2-5.1A8.5 8.5 0 1 1 21 11.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 10.5h7M8.5 13.5h4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <a href="#contact" class="xp-row reveal" data-img="assets/img/xp/conseil.webp" data-cursor="Voir">
+            <span class="xp-row__num">03</span>
+            <span class="xp-row__main">
+              <span class="xp-row__title">Conseil</span>
+              <span class="xp-row__desc">Accompagnement stratégique préventif.</span>
             </span>
-            <h3 class="xp__title">Conseil</h3>
-            <p class="xp__desc">Accompagnement stratégique préventif.</p>
-          </article>
+            <span class="xp-row__arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </a>
 
-          <article class="xp reveal">
-            <span class="xp__num">04</span>
-            <span class="xp__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M4 18c2-1 3-4 3-8V7a2 2 0 1 1 4 0M8 7c0 5-2 9-4 11m13-9c0 3.5 1 7 3 9m-3-9a2 2 0 1 0-4 0c0 5 2 7 4 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <a href="#contact" class="xp-row reveal" data-img="assets/img/xp/orateur.webp" data-cursor="Voir">
+            <span class="xp-row__num">04</span>
+            <span class="xp-row__main">
+              <span class="xp-row__title">Aisance oratoire</span>
+              <span class="xp-row__desc">Argumentation persuasive et éloquence.</span>
             </span>
-            <h3 class="xp__title">Aisance oratoire</h3>
-            <p class="xp__desc">Argumentation persuasive et éloquence.</p>
-          </article>
+            <span class="xp-row__arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </a>
 
-          <article class="xp reveal">
-            <span class="xp__num">05</span>
-            <span class="xp__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M7 4h10a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 9h6M9 12.5h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <a href="#contact" class="xp-row reveal" data-img="assets/img/xp/bibliotheque.webp" data-cursor="Voir">
+            <span class="xp-row__num">05</span>
+            <span class="xp-row__main">
+              <span class="xp-row__title">Expertise juridique</span>
+              <span class="xp-row__desc">Analyse experte des cadres législatifs.</span>
             </span>
-            <h3 class="xp__title">Expertise juridique</h3>
-            <p class="xp__desc">Analyse experte des cadres législatifs.</p>
-          </article>
+            <span class="xp-row__arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </a>
 
-          <article class="xp reveal">
-            <span class="xp__num">06</span>
-            <span class="xp__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.3-9-8.5C1.5 8 3.6 5 6.8 5c2 0 3.6 1.1 4.4 2.7h1.6C13.6 6.1 15.2 5 17.2 5c3.2 0 5.3 3 3.8 6.5-2 4.2-9 8.5-9 8.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <a href="#contact" class="xp-row reveal" data-img="assets/img/xp/plaidoirie.webp" data-cursor="Voir">
+            <span class="xp-row__num">06</span>
+            <span class="xp-row__main">
+              <span class="xp-row__title">Empathie</span>
+              <span class="xp-row__desc">Écoute active et soutien personnalisé.</span>
             </span>
-            <h3 class="xp__title">Empathie</h3>
-            <p class="xp__desc">Écoute active et soutien personnalisé.</p>
-          </article>
+            <span class="xp-row__arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </a>
         </div>
 
         <div class="values" id="cabinet">
@@ -311,7 +339,7 @@
     <section class="journey section" id="parcours">
       <div class="container">
         <header class="section-head reveal">
-          <p class="kicker kicker--dark"><span class="kicker__rule"></span>Background</p>
+          <p class="kicker kicker--dark"><span class="kicker__rule"></span><span class="kicker__index">02</span>Background</p>
           <h2 class="section-title">Formation <em>académique</em></h2>
         </header>
 
@@ -348,8 +376,8 @@
           <div class="timeline__item reveal">
             <span class="timeline__year">2022 — Présent</span>
             <div class="timeline__body">
-              <h3>Avocate stagiaire</h3>
-              <p>Engagement au sein de cabinets prestigieux, pratique intensive du droit civil et contentieux.</p>
+              <h3>Avocate</h3>
+              <p>Pratique intensive du droit civil et du contentieux au sein de cabinets prestigieux, à Djerba et dans la région.</p>
               <button class="link-more" type="button" data-toggle="xp-detail" aria-expanded="false">
                 <span>Voir détails</span>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -365,6 +393,37 @@
             </div>
           </div>
         </div>
+
+        <!-- ── LA MÉTHODE ── -->
+        <div class="method" id="methode">
+          <header class="section-head reveal">
+            <p class="kicker kicker--dark"><span class="kicker__rule"></span><span class="kicker__index">03</span>La méthode</p>
+            <h2 class="section-title">Un accompagnement <em>structuré.</em></h2>
+          </header>
+
+          <div class="steps">
+            <article class="step reveal">
+              <span class="step__num">01</span>
+              <h3 class="step__title">Écoute</h3>
+              <p class="step__desc">Un premier échange confidentiel pour cerner votre situation, vos objectifs et les enjeux réels.</p>
+            </article>
+            <article class="step reveal">
+              <span class="step__num">02</span>
+              <h3 class="step__title">Analyse</h3>
+              <p class="step__desc">Étude minutieuse de chaque pièce, recherche des textes et jurisprudences applicables.</p>
+            </article>
+            <article class="step reveal">
+              <span class="step__num">03</span>
+              <h3 class="step__title">Stratégie</h3>
+              <p class="step__desc">Un plan d'action clair — procédure, négociation ou médiation — avec des délais transparents.</p>
+            </article>
+            <article class="step reveal">
+              <span class="step__num">04</span>
+              <h3 class="step__title">Défense</h3>
+              <p class="step__desc">Plaidoirie et suivi rigoureux : vous êtes informé à chaque évolution de votre dossier.</p>
+            </article>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -373,7 +432,7 @@
       <div class="container">
         <div class="contact__grid">
           <div class="contact__info">
-            <p class="kicker reveal"><span class="kicker__rule"></span>Contact</p>
+            <p class="kicker reveal"><span class="kicker__rule"></span><span class="kicker__index">04</span>Contact</p>
             <h2 class="section-title reveal">Votre défense<br><em>commence ici.</em></h2>
             <p class="contact__lead reveal">Chaque dossier commence par une conversation. Prenez rendez-vous pour une première consultation confidentielle.</p>
 
@@ -394,7 +453,7 @@
                 <span class="contact-card__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
                 </span>
-                <div><em>Cabinet</em><span>Tunis — Tunisie</span></div>
+                <div><em>Cabinet</em><span>Djerba — Tunisie</span></div>
               </li>
               <li class="contact-card reveal">
                 <span class="contact-card__icon" aria-hidden="true">
@@ -449,7 +508,7 @@
                 <small class="field__error">Veuillez décrire brièvement votre demande.</small>
               </div>
 
-              <button type="submit" class="btn btn--gold btn--lg btn--full">
+              <button type="submit" class="btn btn--gold btn--lg btn--full magnetic">
                 <span>Envoyer la demande</span>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
@@ -459,6 +518,56 @@
                 Merci, votre demande a bien été préparée. Votre application email va s'ouvrir pour l'envoyer au cabinet.
               </p>
             </form>
+          </div>
+        </div>
+
+        <!-- ── FAQ ── -->
+        <div class="faq">
+          <header class="section-head section-head--center reveal">
+            <p class="kicker kicker--center"><span class="kicker__rule"></span>Questions fréquentes<span class="kicker__rule"></span></p>
+            <h2 class="section-title">Vos <em>questions.</em></h2>
+          </header>
+
+          <div class="faq__list">
+            <div class="faq__item reveal">
+              <button class="faq__q" type="button" data-toggle="faq-1" aria-expanded="false">
+                <span>Comment se déroule le premier rendez-vous ?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </button>
+              <div class="faq__a" id="faq-1" hidden><p>Le premier rendez-vous est une consultation confidentielle dédiée à l'écoute de votre situation. Nous examinons ensemble vos documents, évaluons les possibilités d'action et définissons une première orientation stratégique — sans engagement.</p></div>
+            </div>
+
+            <div class="faq__item reveal">
+              <button class="faq__q" type="button" data-toggle="faq-2" aria-expanded="false">
+                <span>Comment sont fixés les honoraires ?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </button>
+              <div class="faq__a" id="faq-2" hidden><p>Les honoraires sont présentés en toute transparence dès la première consultation, en fonction de la complexité du dossier. Une convention d'honoraires écrite est systématiquement établie, conformément aux règles déontologiques du Barreau de Djerba.</p></div>
+            </div>
+
+            <div class="faq__item reveal">
+              <button class="faq__q" type="button" data-toggle="faq-3" aria-expanded="false">
+                <span>Mes informations sont-elles vraiment confidentielles ?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </button>
+              <div class="faq__a" id="faq-3" hidden><p>Absolument. Le secret professionnel est absolu et général : chaque échange, chaque pièce de votre dossier est strictement protégé, de la première consultation jusqu'à la clôture de la procédure.</p></div>
+            </div>
+
+            <div class="faq__item reveal">
+              <button class="faq__q" type="button" data-toggle="faq-4" aria-expanded="false">
+                <span>Quels documents apporter à une première consultation ?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </button>
+              <div class="faq__a" id="faq-4" hidden><p>Tout document en lien avec votre affaire : contrats, correspondances, mises en demeure, jugements, constats… À défaut, venez simplement avec vos souvenirs des faits : nous trierons ensemble l'essentiel.</p></div>
+            </div>
+
+            <div class="faq__item reveal">
+              <button class="faq__q" type="button" data-toggle="faq-5" aria-expanded="false">
+                <span>Quels sont les délais de réponse du cabinet ?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </button>
+              <div class="faq__a" id="faq-5" hidden><p>Toute prise de contact reçoit une réponse sous 24 heures ouvrées. Les délais de procédure vous sont ensuite communiqués clairement à chaque étape de votre dossier.</p></div>
+            </div>
           </div>
         </div>
       </div>
@@ -473,7 +582,7 @@
           <path d="M24 52h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
         <h2>Votre défense commence <em>aujourd'hui.</em></h2>
-        <a href="#contact" class="btn btn--gold btn--lg">
+        <a href="#contact" class="btn btn--ink btn--lg magnetic">
           <span>Contactez le cabinet</span>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
@@ -483,8 +592,12 @@
 
   <!-- ═══════════════ FOOTER ═══════════════ -->
   <footer class="footer">
+    <div class="footer__giant" aria-hidden="true">
+      <span class="footer__giant-text">Absi&nbsp;Elhem</span>
+    </div>
+
     <div class="container footer__inner">
-      <div class="footer__brand">
+      <div class="footer__col footer__brand">
         <a href="#hero" class="brand brand--footer" aria-label="Retour en haut">
           <svg class="brand__mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
             <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity=".45"/>
@@ -492,24 +605,45 @@
             <path d="M20 18l-6 14a7 7 0 0 0 12 0l-6-14zM44 18l-6 14a7 7 0 0 0 12 0l-6-14z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
             <path d="M24 52h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
           </svg>
-          <span class="brand__text"><strong>Absi Elhem</strong><em>Avocate — Barreau de Tunis</em></span>
+          <span class="brand__text"><strong>Absi Elhem</strong><em>Avocate — Barreau de Djerba</em></span>
         </a>
         <p class="footer__tagline">L'art de la défense — rigueur, éthique et engagement total pour chaque dossier.</p>
       </div>
 
-      <nav class="footer__nav" aria-label="Navigation pied de page">
-        <a href="#profil">Profil</a>
-        <a href="#expertise">Expertises</a>
-        <a href="#parcours">Parcours</a>
-        <a href="#contact">Contact</a>
-      </nav>
+      <div class="footer__col">
+        <h3 class="footer__heading">Navigation</h3>
+        <nav class="footer__nav" aria-label="Navigation pied de page">
+          <a href="#profil">Profil</a>
+          <a href="#expertise">Expertises</a>
+          <a href="#parcours">Parcours</a>
+          <a href="#methode">Méthode</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
 
-      <div class="footer__meta">
-        <p>© <span id="year">2025</span> Maître Absi Elhem — Avocate au Barreau de Tunis.<br>Tous droits réservés.</p>
-        <a href="#hero" class="to-top" id="toTop" aria-label="Retour en haut de page">
+      <div class="footer__col">
+        <h3 class="footer__heading">Contact</h3>
+        <ul class="footer__contact">
+          <li><a href="tel:+21600000000">+216 XX XXX XXX</a></li>
+          <li><a href="mailto:contact@cabinet-absi-elhem.tn">contact@cabinet-absi-elhem.tn</a></li>
+          <li>Djerba — Tunisie</li>
+          <li>Lun — Ven · 9h00 → 18h00</li>
+        </ul>
+      </div>
+
+      <div class="footer__col footer__col--time">
+        <h3 class="footer__heading">Djerba</h3>
+        <p class="footer__clock"><span id="footerClock">--:--</span></p>
+        <p class="footer__tz">Heure locale — Tunisie</p>
+        <a href="#hero" class="to-top magnetic" id="toTop" aria-label="Retour en haut de page">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
+    </div>
+
+    <div class="container footer__bottom">
+      <p>© <span id="year">2025</span> Maître Absi Elhem — Avocate au Barreau de Djerba. Tous droits réservés.</p>
+      <p class="footer__motto"><em>« L'art de la défense »</em></p>
     </div>
   </footer>
 

@@ -1,85 +1,201 @@
 /* ═══════════════════════════════════════════════════════════════
-   MAÎTRE ABSI ELHEM — Interactions premium
+   MAÎTRE ABSI ELHEM — Moteur d'interactions premium v2
+   Preloader cinématique · curseur magnetique
+   Manifesto mot-à-mot · aperçu flottant expertises · FAQ · horloge
    ═══════════════════════════════════════════════════════════════ */
 (() => {
   'use strict';
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const $  = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+  const lerp = (a, b, t) => a + (b - a) * t;
 
-  /* ── Année courante ─────────────────────────────────────── */
-  $('#year').textContent = new Date().getFullYear();
+  /* ── Année ──────────────────────────────────────────────── */
+  const yearEl = $('#year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ── Preloader ──────────────────────────────────────────── */
+  /* ── Preloader cinématique ──────────────────────────────── */
+  document.body.classList.add('is-locked');
   const preloader = $('#preloader');
   const preBar = $('.preloader__bar span');
+  const prePct = $('#preloaderPct');
 
   let progress = 0;
+  let loaded = false;
   const tick = setInterval(() => {
-    progress = Math.min(progress + Math.random() * 22, 92);
+    progress = Math.min(progress + Math.random() * 16, loaded ? 100 : 90);
     preBar.style.width = progress + '%';
-  }, 140);
+    if (prePct) prePct.textContent = Math.round(progress);
+    if (progress >= 100) {
+      clearInterval(tick);
+      setTimeout(finishLoad, 250);
+    }
+  }, 120);
 
-  const hidePreloader = () => {
-    clearInterval(tick);
-    preBar.style.width = '100%';
-    setTimeout(() => {
-      preloader.classList.add('is-done');
-      document.body.classList.add('is-loaded');
-      revealOnScroll(); // première passe
-    }, 350);
+  const finishLoad = () => {
+    if (document.body.classList.contains('is-loaded')) return;
+    preloader.classList.add('is-done');
+    document.body.classList.remove('is-locked');
+    document.body.classList.add('is-loaded');
+    onScrollFrame(); // première passe des effets liés au scroll
   };
-  window.addEventListener('load', () => setTimeout(hidePreloader, prefersReduced ? 100 : 900));
-  setTimeout(hidePreloader, 3500); // filet de sécurité
+  addEventListener('load', () => {
+    loaded = true;
+    progress = Math.max(progress, 92);
+    setTimeout(() => { progress = 100; }, 350);
+  });
+  setTimeout(() => { progress = 100; }, 3200); // filet de sécurité
 
-  /* ── Curseur personnalisé ───────────────────────────────── */
+  /* ── Souris globale + boucle rAF maître ─────────────────── */
+  const mouse = { x: innerWidth / 2, y: innerHeight / 2 };
+  addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+
   const dot = $('#cursorDot');
   const ring = $('#cursorRing');
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !prefersReduced) {
-    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
-    addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
-    });
-    (function loop() {
-      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
+  const cursorLabel = $('#cursorLabel');
+  let rx = mouse.x, ry = mouse.y;
+
+  const preview = $('#xpPreview');
+  const previewImg = $('#xpPreviewImg');
+  let pv = { x: mouse.x, y: mouse.y, tx: mouse.x, ty: mouse.y, vx: 0, active: false };
+
+  const masterLoop = (time) => {
+    // Curseur personnalisé
+    if (finePointer && !prefersReduced) {
+      dot.style.transform = `translate(${mouse.x}px, ${mouse.y}px) translate(-50%,-50%)`;
+      rx = lerp(rx, mouse.x, 0.16);
+      ry = lerp(ry, mouse.y, 0.16);
       ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
-      requestAnimationFrame(loop);
-    })();
-    $$('a, button, .xp, .value, input, select, textarea').forEach(el => {
+    }
+
+    // Aperçu flottant des expertises
+    if (pv.active) {
+      const prevX = pv.x;
+      pv.x = lerp(pv.x, pv.tx, 0.11);
+      pv.y = lerp(pv.y, pv.ty, 0.11);
+      pv.vx = pv.x - prevX;
+      const rot = Math.max(-7, Math.min(7, pv.vx * 0.55));
+      preview.style.transform =
+        `translate(${pv.x}px, ${pv.y}px) translate(-50%,-58%) rotate(${rot}deg) scale(1)`;
+    }
+
+    requestAnimationFrame(masterLoop);
+  };
+  requestAnimationFrame(masterLoop);
+
+  /* ── Curseur : survols & étiquettes ─────────────────────── */
+  if (finePointer && !prefersReduced) {
+    $$('a, button, input, select, textarea, .value, .step').forEach(el => {
       el.addEventListener('mouseenter', () => ring.classList.add('is-hover'));
       el.addEventListener('mouseleave', () => ring.classList.remove('is-hover'));
     });
+    $$('[data-cursor]').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursorLabel.textContent = el.dataset.cursor;
+        ring.classList.add('has-label');
+      });
+      el.addEventListener('mouseleave', () => ring.classList.remove('has-label'));
+    });
   }
 
-  /* ── Header + barre de progression + lien actif ─────────── */
+  /* ── Boutons magnétiques ────────────────────────────────── */
+  if (finePointer && !prefersReduced) {
+    $$('.magnetic').forEach(el => {
+      el.addEventListener('mousemove', e => {
+        const r = el.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        el.style.transition = 'transform .18s ease-out';
+        el.style.transform = `translate(${dx * 0.22}px, ${dy * 0.3}px)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transition = 'transform .55s cubic-bezier(.22,1.4,.36,1)';
+        el.style.transform = 'translate(0,0)';
+      });
+    });
+  }
+
+  /* ── Header · progression · lien actif ──────────────────── */
   const header = $('#header');
   const progressBar = $('#scrollProgressBar');
   const navLinks = $$('.nav__link');
-  const sections = navLinks
-    .map(l => $(l.getAttribute('href')))
-    .filter(Boolean);
+  const sections = navLinks.map(l => $(l.getAttribute('href'))).filter(Boolean);
+  const manifesto = $('#manifesto');
 
-  const onScroll = () => {
+  /* Découpage du manifesto en mots (préserve les <em>) */
+  let manifestoWords = [];
+  if (manifesto) {
+    const wrapWords = (node) => {
+      [...node.childNodes].forEach(child => {
+        if (child.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach(part => {
+            if (/^\s+$/.test(part) || part === '') { frag.appendChild(document.createTextNode(part)); }
+            else {
+              const span = document.createElement('span');
+              span.className = 'w';
+              span.textContent = part;
+              frag.appendChild(span);
+              manifestoWords.push(span);
+            }
+          });
+          node.replaceChild(frag, child);
+        } else if (child.nodeType === 1) wrapWords(child);
+      });
+    };
+    wrapWords(manifesto);
+    if (prefersReduced) manifestoWords.forEach(w => w.classList.add('is-on'));
+  }
+
+  /* ── Parallaxe ──────────────────────────────────────────── */
+  const pxEls = prefersReduced ? [] : $$('[data-parallax]');
+
+  const onScrollFrame = () => {
     const y = scrollY;
-    header.classList.toggle('is-scrolled', y > 40);
+    const vh = innerHeight;
 
-    const max = document.documentElement.scrollHeight - innerHeight;
+    header.classList.toggle('is-scrolled', y > 40);
+    const max = document.documentElement.scrollHeight - vh;
     progressBar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
 
     let current = null;
     for (const sec of sections) {
-      if (sec.getBoundingClientRect().top <= innerHeight * 0.4) current = sec.id;
+      if (sec.getBoundingClientRect().top <= vh * 0.4) current = sec.id;
     }
     navLinks.forEach(l => l.classList.toggle('is-active', l.getAttribute('href') === `#${current}`));
+
+    // Manifesto mot-à-mot
+    if (manifesto && !prefersReduced) {
+      const r = manifesto.getBoundingClientRect();
+      const p = Math.min(Math.max((vh * 0.88 - r.top) / (vh * 0.42), 0), 1);
+      const n = Math.floor(p * manifestoWords.length);
+      manifestoWords.forEach((w, i) => w.classList.toggle('is-on', i < n));
+    }
+
+    // Parallaxe douce
+    pxEls.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return;
+      const offset = (r.top + r.height / 2 - vh / 2) * parseFloat(el.dataset.parallax);
+      el.style.transform = `translateY(${offset.toFixed(1)}px)`;
+    });
   };
-  addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+
+  let scrollScheduled = false;
+  addEventListener('scroll', () => {
+    if (!scrollScheduled) {
+      requestAnimationFrame(() => { onScrollFrame(); scrollScheduled = false; });
+      scrollScheduled = true;
+    }
+  }, { passive: true });
+  addEventListener('resize', onScrollFrame, { passive: true });
 
   /* ── Menu mobile ────────────────────────────────────────── */
   const burger = $('#burger');
   const nav = $('#nav');
+  const isMenuOpen = () => nav.classList.contains('is-open');
   const toggleMenu = (open) => {
     nav.classList.toggle('is-open', open);
     burger.classList.toggle('is-open', open);
@@ -87,11 +203,16 @@
     burger.setAttribute('aria-expanded', open);
     burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
   };
-  burger.addEventListener('click', () => toggleMenu(!nav.classList.contains('is-open')));
-  nav.addEventListener('click', e => { if (e.target.closest('a')) toggleMenu(false); });
-  addEventListener('keydown', e => { if (e.key === 'Escape') toggleMenu(false); });
+  burger.addEventListener('click', () => toggleMenu(!isMenuOpen()));
+  /* Fermeture en phase de capture : le menu se referme AVANT le
+     défilement ancré, donc le scroll n'est jamais bloqué. */
+  nav.addEventListener('click', e => {
+    if (e.target.closest('a')) toggleMenu(false);
+  }, true);
+  addEventListener('keydown', e => { if (e.key === 'Escape' && isMenuOpen()) toggleMenu(false); });
+  addEventListener('resize', () => { if (innerWidth > 960 && isMenuOpen()) toggleMenu(false); });
 
-  /* ── Révélations au scroll ─────────────────────────────── */
+  /* ── Révélations au scroll ──────────────────────────────── */
   const revealObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -101,29 +222,23 @@
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-  function revealOnScroll() {
-    $$('.reveal:not(.is-visible)').forEach((el, i) => {
-      // léger décalage au sein d'un même groupe visible
-      const siblings = [...(el.parentElement?.children ?? [])].filter(c => c.classList?.contains('reveal'));
-      const idx = Math.max(0, siblings.indexOf(el));
-      el.style.setProperty('--d', `${Math.min(idx * 0.12, 0.6)}s`);
-      revealObserver.observe(el);
-    });
-  }
-  revealOnScroll();
+  $$('.reveal:not(.is-visible)').forEach(el => {
+    const siblings = [...(el.parentElement?.children ?? [])].filter(c => c.classList?.contains('reveal'));
+    const idx = Math.max(0, siblings.indexOf(el));
+    el.style.setProperty('--d', `${Math.min(idx * 0.1, 0.5)}s`);
+    revealObserver.observe(el);
+  });
 
-  /* ── Compteurs animés ──────────────────────────────────── */
+  /* ── Compteurs animés ───────────────────────────────────── */
   const animateCount = (el) => {
     const target = +el.dataset.count;
     const suffix = el.dataset.suffix || '';
     const pad = +(el.dataset.pad || 0);
-    const dur = 2000;
     const t0 = performance.now();
     const step = (t) => {
-      const p = Math.min((t - t0) / dur, 1);
+      const p = Math.min((t - t0) / 2000, 1);
       const eased = 1 - Math.pow(1 - p, 4);
-      const val = Math.round(target * eased);
-      el.textContent = String(val).padStart(pad, '0').padStart(2, '0') + suffix;
+      el.textContent = String(Math.round(target * eased)).padStart(pad, '0') + suffix;
       if (p < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
@@ -135,7 +250,7 @@
   }, { threshold: 0.5 });
   $$('.stat__num').forEach(el => countObserver.observe(el));
 
-  /* ── Barres de langue ──────────────────────────────────── */
+  /* ── Barres de langue ───────────────────────────────────── */
   const langObserver = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -146,51 +261,56 @@
   }, { threshold: 0.6 });
   $$('.lang__bar span').forEach(el => langObserver.observe(el));
 
-  /* ── Parallaxe douce ───────────────────────────────────── */
-  if (!prefersReduced) {
-    const pxEls = $$('[data-parallax]');
-    let ticking = false;
-    const applyParallax = () => {
-      const vh = innerHeight;
-      pxEls.forEach(el => {
-        const r = el.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > vh) return;
-        const speed = parseFloat(el.dataset.parallax);
-        const offset = (r.top + r.height / 2 - vh / 2) * speed;
-        el.style.transform = `translateY(${offset.toFixed(1)}px)`;
+  /* ── Aperçu flottant des expertises (chargement à la demande) ── */
+  if (finePointer && !prefersReduced) {
+    const list = $('.xp-list');
+    $$('.xp-row').forEach(row => {
+      row.addEventListener('mouseenter', () => {
+        if (previewImg.getAttribute('src') !== row.dataset.img) {
+          previewImg.src = row.dataset.img; // chargé uniquement au premier survol
+        }
+        preview.classList.add('is-on');
+        pv.active = true;
       });
-      ticking = false;
-    };
-    addEventListener('scroll', () => {
-      if (!ticking) { requestAnimationFrame(applyParallax); ticking = true; }
-    }, { passive: true });
-    applyParallax();
+    });
+    list.addEventListener('mousemove', e => {
+      pv.tx = e.clientX + 130;
+      pv.ty = e.clientY;
+    });
+    list.addEventListener('mouseleave', () => {
+      preview.classList.remove('is-on');
+      pv.active = false;
+    });
   }
 
-  /* ── Détails expérience (accordéon) ────────────────────── */
+  /* ── Accordéons génériques (détail XP + FAQ) ────────────── */
   $$('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const target = $(`#${btn.dataset.toggle}`);
-      const open = btn.getAttribute('aria-expanded') === 'true';
-      btn.setAttribute('aria-expanded', String(!open));
-      if (open) {
+      const target = document.getElementById(btn.dataset.toggle);
+      if (!target) return;
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+      if (isOpen) {
+        btn.setAttribute('aria-expanded', 'false');
         target.style.maxHeight = target.scrollHeight + 'px';
-        requestAnimationFrame(() => { target.style.maxHeight = '0'; target.style.overflow = 'hidden'; });
-        setTimeout(() => { target.hidden = true; target.style = ''; }, 450);
+        target.style.overflow = 'hidden';
+        requestAnimationFrame(() => { target.style.maxHeight = '0px'; });
+        setTimeout(() => { target.hidden = true; target.style = ''; }, 480);
       } else {
+        btn.setAttribute('aria-expanded', 'true');
         target.hidden = false;
-        target.style.maxHeight = '0'; target.style.overflow = 'hidden';
+        target.style.overflow = 'hidden';
+        target.style.maxHeight = '0px';
         requestAnimationFrame(() => { target.style.maxHeight = target.scrollHeight + 'px'; });
-        setTimeout(() => { target.style = ''; }, 500);
+        setTimeout(() => { target.style = ''; }, 520);
       }
     });
   });
 
-  /* ── Formulaire de contact ─────────────────────────────── */
+  /* ── Formulaire de contact ──────────────────────────────── */
   const form = $('#contactForm');
   const success = $('#formSuccess');
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
   const setInvalid = (input, invalid) =>
     input.closest('.field').classList.toggle('is-invalid', invalid);
 
@@ -208,8 +328,6 @@
       $('.field.is-invalid input, .field.is-invalid textarea')?.focus();
       return;
     }
-
-    // Ouvre le client mail pré-rempli (front-end démo, sans backend)
     const subject = encodeURIComponent(`Demande de rendez-vous — ${name.value.trim()}`);
     const body = encodeURIComponent(
       `Nom : ${name.value.trim()}\n` +
@@ -228,7 +346,7 @@
     input.addEventListener('input', () => setInvalid(input, false))
   );
 
-  /* ── Défilement ancré avec compensation du header ──────── */
+  /* ── Ancres douces (défilement natif) ───────────────────── */
   $$('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
       const id = a.getAttribute('href');
@@ -240,4 +358,15 @@
       scrollTo({ top, behavior: prefersReduced ? 'auto' : 'smooth' });
     });
   });
+
+  /* ── Horloge locale de Tunis (footer) ───────────────────── */
+  const clock = $('#footerClock');
+  if (clock) {
+    const fmt = new Intl.DateTimeFormat('fr-FR', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Tunis',
+    });
+    const updateClock = () => { clock.textContent = fmt.format(new Date()); };
+    updateClock();
+    setInterval(updateClock, 15000);
+  }
 })();
