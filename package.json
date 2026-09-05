@@ -4,8 +4,8 @@
   "description": "Site Web & Cabinet d'Avocat Maître Ilhem ABSI ANANE avec Base de Données Réelle & Espace Admin",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node --experimental-sqlite server.js",
+    "dev": "node --watch --experimental-sqlite server.js"
   },
   "keywords": ["avocate", "djerba", "tunisie", "portfolio", "database"],
   "author": "Maître Ilhem ABSI ANANE",

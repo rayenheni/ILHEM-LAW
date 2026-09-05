@@ -3,17 +3,16 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const crypto = require('crypto');
+const { DatabaseSync } = require('node:sqlite');
 
 const PORT = process.env.PORT || 3000;
 const DB_DIR = path.join(__dirname, 'data');
-const DB_FILE = path.join(DB_DIR, 'submissions.json');
+const DB_FILE = path.join(DB_DIR, 'ilhem.db');
+const LEGACY_JSON = path.join(DB_DIR, 'submissions.json');
 
 // Configuration Administrateur & Sécurité
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'Ilhem@2026!';
-
-// Stockage mémoire des jetons de session actifs
-const activeTokens = new Set();
 
 // Types MIME pour les fichiers statiques
 const MIME_TYPES = {
@@ -30,34 +29,124 @@ const MIME_TYPES = {
   '.txt': 'text/plain; charset=UTF-8'
 };
 
-// Initialisation de la base de données
+// Initialisation de la base de données SQLite
+let db = null;
+
 const initDb = () => {
   if (!fs.existsSync(DB_DIR)) {
     fs.mkdirSync(DB_DIR, { recursive: true });
   }
-  if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify([], null, 2), 'utf8');
+  if (!db) {
+    db = new DatabaseSync(DB_FILE);
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS submissions (
+        id            TEXT PRIMARY KEY,
+        date          TEXT NOT NULL,
+        dateFormatted  TEXT NOT NULL,
+        name          TEXT NOT NULL,
+        email         TEXT NOT NULL,
+        phone         TEXT NOT NULL DEFAULT '—',
+        caseType      TEXT NOT NULL DEFAULT 'Non spécifié',
+        message       TEXT NOT NULL,
+        status        TEXT NOT NULL DEFAULT 'Nouveau'
+      )
+    `);
+    db.exec('CREATE INDEX IF NOT EXISTS idx_submissions_date ON submissions(date)');
+  }
+  migrateFromJson();
+};
+
+// Migration des données de l'ancien fichier JSON vers SQLite (une seule fois)
+const migrateFromJson = () => {
+  if (!fs.existsSync(LEGACY_JSON)) return;
+  try {
+    const legacy = JSON.parse(fs.readFileSync(LEGACY_JSON, 'utf8') || '[]');
+    if (Array.isArray(legacy) && legacy.length) {
+      const stmt = db.prepare(
+        `INSERT OR IGNORE INTO submissions (id, date, dateFormatted, name, email, phone, caseType, message, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      );
+      db.exec('BEGIN');
+      try {
+        for (const r of legacy) {
+          stmt.run(
+            r.id, r.date, r.dateFormatted,
+            String(r.name || ''), String(r.email || ''),
+            String(r.phone || '—'), String(r.caseType || 'Non spécifié'),
+            String(r.message || ''), String(r.status || 'Nouveau')
+          );
+        }
+        db.exec('COMMIT');
+      } catch (err) {
+        db.exec('ROLLBACK');
+        throw err;
+      }
+      console.log(`[DB] Migration : ${legacy.length} demande(s) importée(s) depuis submissions.json`);
+    }
+    fs.renameSync(LEGACY_JSON, LEGACY_JSON + '.bak');
+    console.log('[DB] submissions.json conservé en submissions.json.bak');
+  } catch (e) {
+    console.warn('[DB] Migration ignorée :', e.message);
   }
 };
 
-const readDb = () => {
+// CRUD SQLite — demandes de contact
+const allSubmissions = () => {
+  initDb();
+  return db.prepare('SELECT * FROM submissions ORDER BY rowid DESC').all();
+};
+
+const findSubmission = (id) => {
+  initDb();
+  return db.prepare('SELECT * FROM submissions WHERE id = ?').get(id);
+};
+
+const insertSubmission = (sub) => {
+  initDb();
+  const stmt = db.prepare(
+    `INSERT INTO submissions (id, date, dateFormatted, name, email, phone, caseType, message, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+  stmt.run(sub.id, sub.date, sub.dateFormatted, sub.name, sub.email, sub.phone, sub.caseType, sub.message, sub.status);
+};
+
+const updateSubmissionStatus = (id, status) => {
+  initDb();
+  db.prepare('UPDATE submissions SET status = ? WHERE id = ?').run(status, id);
+};
+
+const deleteSubmission = (id) => {
+  initDb();
+  const info = db.prepare('DELETE FROM submissions WHERE id = ?').run(id);
+  return info.changes > 0;
+};
+
+const clearSubmissions = () => {
+  initDb();
+  db.prepare('DELETE FROM submissions').run();
+};
+
+// Stockage persistant des jetons de session actifs (survit aux redémarrages)
+const SESSION_FILE = path.join(DB_DIR, 'sessions.json');
+
+const loadSessions = () => {
   initDb();
   try {
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf8') || '[]');
+    const raw = fs.readFileSync(SESSION_FILE, 'utf8');
+    const parsed = JSON.parse(raw || '{}');
+    return new Set(Array.isArray(parsed.tokens) ? parsed.tokens : []);
   } catch (e) {
-    return [];
+    return new Set();
   }
 };
 
-const writeDb = (data) => {
-  initDb();
+const saveSessions = (tokens) => {
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
-    return true;
-  } catch (e) {
-    return false;
-  }
+    fs.writeFileSync(SESSION_FILE, JSON.stringify({ tokens: Array.from(tokens) }, null, 2), 'utf8');
+  } catch (e) {}
 };
+
+const activeTokens = loadSessions();
 
 // Helper JSON Response
 const sendJson = (res, statusCode, body) => {
@@ -111,6 +200,7 @@ const server = http.createServer((req, res) => {
         if (username === ADMIN_USER && password === ADMIN_PASS) {
           const token = 'tok_' + crypto.randomBytes(24).toString('hex');
           activeTokens.add(token);
+          saveSessions(activeTokens);
           console.log(`[AUTH] Connexion réussie pour l'administrateur (${username})`);
           return sendJson(res, 200, { success: true, token, username });
         } else {
@@ -150,7 +240,6 @@ const server = http.createServer((req, res) => {
             return sendJson(res, 400, { success: false, error: 'Veuillez remplir les champs obligatoires (Nom, Email, Message).' });
           }
 
-          const subs = readDb();
           const now = new Date();
           const newSub = {
             id: 'sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
@@ -168,11 +257,10 @@ const server = http.createServer((req, res) => {
             status: 'Nouveau'
           };
 
-          subs.unshift(newSub);
-          writeDb(subs);
+          insertSubmission(newSub);
 
           console.log(`[DATABASE] Nouvelle demande client enregistrée : ${newSub.name} (${newSub.email})`);
-          return sendJson(res, 201, { success: true, message: 'Demande enregistrée dans la base de données.', data: newSub });
+          return sendJson(res, 201, { success: true, message: 'Demande enregistrée dans la base de données.', data: findSubmission(newSub.id) });
         } catch (e) {
           return sendJson(res, 400, { success: false, error: 'Format JSON invalide.' });
         }
@@ -187,7 +275,7 @@ const server = http.createServer((req, res) => {
 
     // GET /api/contact -> SÉCURISÉ (Récupération des demandes par l'admin)
     if (method === 'GET' && reqPath === '/api/contact') {
-      const subs = readDb();
+      const subs = allSubmissions();
       return sendJson(res, 200, { success: true, count: subs.length, data: subs });
     }
 
@@ -198,35 +286,28 @@ const server = http.createServer((req, res) => {
       req.on('data', chunk => { bodyStr += chunk.toString(); });
       req.on('end', () => {
         const body = JSON.parse(bodyStr || '{}');
-        const subs = readDb();
-        const sub = subs.find(s => s.id === id);
+        const sub = findSubmission(id);
         if (!sub) return sendJson(res, 404, { success: false, error: 'Introuvable' });
 
-        sub.status = body.status || (sub.status === 'Nouveau' ? 'Traité' : 'Nouveau');
-        writeDb(subs);
-        return sendJson(res, 200, { success: true, data: sub });
+        const newStatus = body.status || (sub.status === 'Nouveau' ? 'Traité' : 'Nouveau');
+        updateSubmissionStatus(id, newStatus);
+        return sendJson(res, 200, { success: true, data: findSubmission(id) });
       });
       return;
     }
 
     // DELETE /api/contact -> SÉCURISÉ (Vider la base)
     if (method === 'DELETE' && reqPath === '/api/contact') {
-      writeDb([]);
+      clearSubmissions();
       return sendJson(res, 200, { success: true, message: 'Base de données réinitialisée.' });
     }
 
     // DELETE /api/contact/:id -> SÉCURISÉ (Supprimer une demande)
     if (method === 'DELETE' && reqPath.startsWith('/api/contact/')) {
       const id = reqPath.replace('/api/contact/', '');
-      let subs = readDb();
-      const initialCount = subs.length;
-      subs = subs.filter(s => s.id !== id);
-
-      if (subs.length === initialCount) {
+      if (!deleteSubmission(id)) {
         return sendJson(res, 404, { success: false, error: 'Introuvable' });
       }
-
-      writeDb(subs);
       return sendJson(res, 200, { success: true, message: 'Demande supprimée.' });
     }
   }
@@ -272,10 +353,19 @@ server.listen(PORT, () => {
   console.log(`
   ═══════════════════════════════════════════════════════════════
   🚀 Cabinet Maître Ilhem ABSI ANANE — Backend & Clean URLs
+  🗄️  Base de données : SQLite (${DB_FILE})
   🌐 Site Français (Clean) : http://localhost:${PORT}/
   🌐 Site Arabe (Clean)    : http://localhost:${PORT}/ar
   🔒 Espace Admin (Clean)  : http://localhost:${PORT}/admin
   🔐 Identifiants Admin   : Login: ${ADMIN_USER} | Pass: ${ADMIN_PASS}
   ═══════════════════════════════════════════════════════════════
   `);
+  const subs = allSubmissions();
+  console.log(`[DB] Prêt : ${subs.length} demande(s) en base.`);
 });
+
+// Persist sessions on shutdown/restart
+const persistSessions = () => saveSessions(activeTokens);
+process.on('SIGINT', persistSessions);
+process.on('SIGTERM', persistSessions);
+process.on('exit', persistSessions);

@@ -653,6 +653,7 @@
 
           if (res.ok && data.success && data.token) {
             sessionStorage.setItem(AUTH_KEY, data.token);
+            localStorage.setItem(AUTH_KEY, data.token);
             hideLogin();
             loadSubmissions();
           } else {
@@ -663,6 +664,7 @@
           // Fallback login if offline (password: Ilhem@2026!)
           if (pass === 'Ilhem@2026!' || pass === 'admin') {
             sessionStorage.setItem(AUTH_KEY, 'local_admin_token');
+            localStorage.setItem(AUTH_KEY, 'local_admin_token');
             hideLogin();
             loadSubmissions();
           } else {

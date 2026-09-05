@@ -310,6 +310,11 @@
   /* ── Formulaire de contact ──────────────────────────────── */
   const form = $('#contactForm');
   const success = $('#formSuccess');
+  const successMsg = $('#formSuccessMsg');
+  const isAr = document.documentElement.lang === 'ar';
+  const msgs = isAr
+    ? { sending: 'جارٍ إرسال طلبكم…', saved: 'شكرًا لكم! تم تسجيل طلبكم لدى المكتب وسنرد عليكم في أقرب وقت.', offline: 'شكرًا لكم! تم تسجيل طلبكم محليًا وسيتم التعامل معه في أقرب وقت.' }
+    : { sending: 'Envoi de votre demande en cours…', saved: 'Merci ! Votre demande a bien été transmise au cabinet. Nous vous répondrons au plus vite.', offline: 'Merci ! Votre demande a été enregistrée localement et sera traitée dès que possible.' };
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const setInvalid = (input, invalid) =>
     input.closest('.field').classList.toggle('is-invalid', invalid);
@@ -337,18 +342,33 @@
     };
 
     // Send POST request to real API Database endpoint
-    try {
-      fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).then(res => res.json())
-        .then(data => console.log('[DATABASE API] Submission saved successfully:', data))
-        .catch(err => console.warn('[DATABASE API] Offline/fallback mode:', err));
-    } catch (err) {
-      console.warn('[DATABASE API] Fetch error:', err);
-    }
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    successMsg.textContent = msgs.sending;
+    success.hidden = false;
 
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(async res => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Erreur d\'enregistrement');
+      console.log('[DATABASE API] Submission saved successfully:', data);
+      saveLocalFallback(payload);
+      successMsg.textContent = msgs.saved;
+    }).catch(err => {
+      console.warn('[DATABASE API] Offline/fallback mode:', err);
+      saveLocalFallback(payload);
+      successMsg.textContent = msgs.offline;
+    }).finally(() => {
+      button.disabled = false;
+      form.reset();
+      setTimeout(() => { success.hidden = true; }, 12000);
+    });
+  });
+
+  const saveLocalFallback = (payload) => {
     // Save to localStorage for Admin Dashboard fallback
     const submission = {
       id: 'sub_' + Date.now(),
@@ -366,20 +386,7 @@
     } catch(err) {
       console.error('Error saving submission to localStorage', err);
     }
-
-    const subject = encodeURIComponent(`Demande de rendez-vous — ${name.value.trim()}`);
-    const body = encodeURIComponent(
-      `Nom : ${name.value.trim()}\n` +
-      `Email : ${email.value.trim()}\n` +
-      `Téléphone : ${$('#f-phone').value.trim() || '—'}\n` +
-      `Type de dossier : ${$('#f-type').value || '—'}\n\n` +
-      `Message :\n${msg.value.trim()}`
-    );
-    success.hidden = false;
-    window.location.href = `mailto:contact@cabinet-absi-anane.tn?subject=${subject}&body=${body}`;
-    form.reset();
-    setTimeout(() => { success.hidden = true; }, 12000);
-  });
+  };
 
   $$('input, textarea', form).forEach(input =>
     input.addEventListener('input', () => setInvalid(input, false))
